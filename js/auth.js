@@ -34,16 +34,36 @@ async function loadUsers() {
   return parseCSV(await res.text());
 }
 
+// Preferred: the Apps Script web app checks the password server-side (sheet can stay private).
+// text/plain keeps it a "simple" CORS request; the password goes in the body, never the URL.
+async function apiLogin(username, password) {
+  const res = await fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ username, password }) });
+  if (!res.ok) throw new Error("Login service unavailable. Try again shortly.");
+  const r = await res.json();
+  if (!r.ok) throw new Error(r.error || "Login failed.");
+  return r;
+}
+
+function saveSession(u) {
+  const session = { username: u.username, name: u.name || u.username, role: u.role || "trainee", exp: Date.now() + CONFIG.SESSION_HOURS * 3600e3 };
+  localStorage.setItem(KEY, JSON.stringify(session));
+  return session;
+}
+
 export async function login(username, password) {
+  if (CONFIG.API_URL) return saveSession(await apiLogin(username.trim(), password));
   const users = await loadUsers();
   const u = users.find(x => (x.username || "").toLowerCase() === username.trim().toLowerCase());
   if (!u) throw new Error("Unknown username.");
   if (u.active && /^(false|no|0)$/i.test(u.active)) throw new Error("This account is disabled.");
-  const ok = u.password_sha256 ? (await sha256(password)) === u.password_sha256.toLowerCase() : u.password === password;
+  let ok;
+  if (u.password) ok = u.password === password;
+  else {
+    const stored = (u.password_sha256 || "").trim();
+    ok = /^[0-9a-f]{64}$/i.test(stored) ? (await sha256(password)) === stored.toLowerCase() : stored === password;
+  }
   if (!ok) throw new Error("Incorrect password.");
-  const session = { username: u.username, name: u.name || u.username, role: u.role || "trainee", exp: Date.now() + CONFIG.SESSION_HOURS * 3600e3 };
-  localStorage.setItem(KEY, JSON.stringify(session));
-  return session;
+  return saveSession(u);
 }
 
 export function currentUser() {
@@ -55,4 +75,4 @@ export function currentUser() {
 }
 
 export function logout() { localStorage.removeItem(KEY); location.reload(); }
-export const demoMode = () => !CONFIG.SHEET_ID;
+export const demoMode = () => !CONFIG.SHEET_ID && !CONFIG.API_URL;

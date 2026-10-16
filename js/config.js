@@ -5,6 +5,9 @@
 // 2. File > Share > Publish to web (or "Anyone with the link: Viewer").
 // 3. Paste the sheet ID (the long string in the sheet URL) below.
 export const CONFIG = {
+  // Apps Script web app URL (apps-script/Code.gs). When set, logins are checked by Google
+  // server-side and the sheet can be private. Takes priority over SHEET_ID.
+  API_URL: "",
   SHEET_ID: "1xNcz3zK4wBGT7zED_48Xj4lEY3bP31ObpPJe3nUX77g",           // e.g. "1AbCdEfGh...". Empty = demo mode.
   SHEET_TAB: "Users",
   // Demo account used only when SHEET_ID is empty (local preview).
