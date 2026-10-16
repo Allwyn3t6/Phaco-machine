@@ -7,7 +7,7 @@
 export const CONFIG = {
   // Apps Script web app URL (apps-script/Code.gs). When set, logins are checked by Google
   // server-side and the sheet can be private. Takes priority over SHEET_ID.
-  API_URL: "",
+  API_URL: "https://script.google.com/macros/s/AKfycbyYMMHZ5t9Xw9ZMIaMdOK_2QMVE6OwaOu9ofC3ikQL34bRhYAhRiUh-PRVRSxzX_z6c/exec",
   SHEET_ID: "1xNcz3zK4wBGT7zED_48Xj4lEY3bP31ObpPJe3nUX77g",           // e.g. "1AbCdEfGh...". Empty = demo mode.
   SHEET_TAB: "Users",
   // Demo account used only when SHEET_ID is empty (local preview).
