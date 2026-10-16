@@ -1,0 +1,2 @@
+﻿username,password_sha256,name,role,active
+demo,d3aa7e399637301d40cb33eadadf81767d9fba68bdd4a7e556b5887cc7237710,Demo Trainee,trainee,TRUE
